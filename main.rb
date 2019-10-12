@@ -49,6 +49,11 @@ before do
   response.headers['Access-Control-Allow-Origin'] = '*'
 end
 
+get '/ical' do
+  content_type 'text/calendar'
+  open(ICAL_URL)
+end
+
 get '/events/:year/:month' do |year, month|
   halt 400, { error: 'provide numbers' }.to_json unless /^\d+$/ === year && /^\d+$/ === month
 
