@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'icalendar'
+require 'icalendar/recurrence'
 require 'open-uri'
 require 'active_support/all'
 require 'sinatra'
@@ -29,12 +30,19 @@ end
 
 def all_events
   calendar = Icalendar::Calendar.parse(open(ICAL_URL)).first
-  calendar.events.map do |event|
+  calendar.events.flat_map do |event|
     Time.zone = 'London'
     event.dtstart = event.dtstart.in_time_zone
     event.dtend = event.dtend.in_time_zone
 
-    event
+    # I really hope there never needs to be an event more than 100 years into
+    # the future
+    event.occurrences_between(Date.today - 100.years, Date.today + 100.years).map do |occurrence|
+      event_occurrence = event.clone
+      event_occurrence.dtstart = occurrence.start_time
+      event_occurrence.dtend = occurrence.end_time
+      event_occurrence
+    end
   end
 end
 
