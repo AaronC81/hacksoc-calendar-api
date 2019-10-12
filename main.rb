@@ -52,6 +52,34 @@ def events_in_month(year, month)
     .sort_by(&:dtstart)
 end
 
+def events_including_surrounding_months(year, month)
+  events = all_events
+
+  prev_month = month - 1
+  prev_year = year
+  if prev_month == 0
+    prev_month = 12
+    year -= 1
+  end
+
+  next_month = month + 1
+  next_year = year
+  if next_month == 13
+    next_month = 0
+    year += 1
+  end
+
+  events
+    .select { |e| e.dtstart.month == prev_month && e.dtstart.year == prev_year }
+    .sort_by(&:dtstart) +
+  events
+    .select { |e| e.dtstart.month == month && e.dtstart.year == year }
+    .sort_by(&:dtstart) +
+  events
+    .select { |e| e.dtstart.month == next_month && e.dtstart.year == next_year }
+    .sort_by(&:dtstart)
+end
+
 before do
   content_type :json
   response.headers['Access-Control-Allow-Origin'] = '*'
@@ -79,7 +107,7 @@ get '/events/:year/:month/calendar' do |year, month|
   year = year.to_i
   month = month.to_i
 
-  events = events_in_month(year, month)
+  events = events_including_surrounding_months(year, month)
 
   calendar_flat = Array.new(CALENDAR_ROWS * DAYS_OF_WEEK) { {} }
 
@@ -92,7 +120,7 @@ get '/events/:year/:month/calendar' do |year, month|
     calendar_flat[i][:day] = current_date.day
     calendar_flat[i][:in_month] = (current_date.month == month)
     calendar_flat[i][:events] = events.select do |event|
-      event.dtstart.year == year && event.dtstart.month == month && event.dtstart.day == current_date.day
+      event.dtstart.year == current_date.year && event.dtstart.month == current_date.month && event.dtstart.day == current_date.day
     end.map { |event| event_to_hash(event) }
     
     current_date = current_date.succ
