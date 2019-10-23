@@ -5,14 +5,14 @@ Returns the HackSoc iCal calendar.
 
 ### `/events/<year>/<month>`
 Gets a list of HackSoc calendar events for the given year and month. The month 
-should be specified as an integer where 1 is January.
+should be specified as a base-10 integer where 1 is January.
 
 Returns an array of Event objects.
 
 ### `/events/<year>/<month>/calendar`
 Gets the HackSoc calendar events for the given year and month, arranged as a
 2D array which can be copied into a calendar. The month should be specified as
-an integer where 1 is January.
+a base-10 integer where 1 is January.
 
 Returns a 2D array, with up to six rows and always seven
 columns, of JSON objects with these keys:
