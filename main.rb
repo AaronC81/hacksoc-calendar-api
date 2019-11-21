@@ -8,6 +8,11 @@ require 'json'
 
 ICAL_URL = 'https://calendar.google.com/calendar/ical/yusu.org_h8uou2ovt1c6gg87q5g758tsvs%40group.calendar.google.com/public/basic.ics'
 
+##
+# Converts a calendar event to a hash representation, which can subsequently be
+# serialized and sent to a client.
+# @param [Icalendar::Event] event The event.
+# @return [Hash] The event as a hash.
 def event_to_hash(event)
   {
     when_raw: {
@@ -28,6 +33,10 @@ def event_to_hash(event)
   }
 end
 
+##
+# Returns an array of all events in the calendar specified by ICAL_URL. This is
+# very slow!
+# @return [Array<Icalendar::Event>] All events in the calendar.
 def all_events
   calendar = Icalendar::Calendar.parse(open(ICAL_URL)).first
   calendar.events.flat_map do |event|
@@ -46,15 +55,29 @@ def all_events
   end
 end
 
+##
+# Gets all of the events from the calendar specified in ICAL_URL which are in
+# the given year and month.
+# @param [Integer] year The calendar year.
+# @param [Integer] month The calendar month; 1 is January.
+# @return [Array<Icalendar::Event>] The events within this month.
 def events_in_month(year, month)
   all_events
     .select { |e| e.dtstart.month == month && e.dtstart.year == year }
     .sort_by(&:dtstart)
 end
 
+##
+# Gets all of the events from the calendar specified in ICAL_URL which are in
+# a 3-month span, whose centre is the given year and month.
+# @param [Integer] year The calendar year.
+# @param [Integer] month The calendar month; 1 is January.
+# @return [Array<Icalendar::Event>] The events within the given month, the month
+#   before, or the month after.
 def events_including_surrounding_months(year, month)
   events = all_events
 
+  # Handle the previous month being in a previous year
   prev_month = month - 1
   prev_year = year
   if prev_month == 0
@@ -62,6 +85,7 @@ def events_including_surrounding_months(year, month)
     prev_year -= 1
   end
 
+  # Handle the next month being in the next year
   next_month = month + 1
   next_year = year
   if next_month == 13
