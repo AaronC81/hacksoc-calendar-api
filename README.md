@@ -17,7 +17,7 @@ a base-10 integer where 1 is January.
 Returns a 2D array, with up to six rows and always seven
 columns, of JSON objects with these keys:
 
-  - `date` - Date this cell represents in the format `YYYY/MM/DD`
+  - `date` - Date this cell represents in the format `YYYY-MM-DD`
   - `day` - Day of the date this cell represents
   - `in_month` - Whether this cell is part of the requested month
   - `events` - The events on this date
