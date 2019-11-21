@@ -6,7 +6,13 @@ require 'active_support/all'
 require 'sinatra'
 require 'json'
 
-ICAL_URL = 'https://calendar.google.com/calendar/ical/yusu.org_h8uou2ovt1c6gg87q5g758tsvs%40group.calendar.google.com/public/basic.ics'
+module CalendarLoader
+  ICAL_URL = 'https://calendar.google.com/calendar/ical/yusu.org_h8uou2ovt1c6gg87q5g758tsvs%40group.calendar.google.com/public/basic.ics'
+
+  def self.body
+    open(ICAL_URL)
+  end
+end
 
 ##
 # Converts a calendar event to a hash representation, which can subsequently be
@@ -38,7 +44,7 @@ end
 # very slow!
 # @return [Array<Icalendar::Event>] All events in the calendar.
 def all_events
-  calendar = Icalendar::Calendar.parse(open(ICAL_URL)).first
+  calendar = Icalendar::Calendar.parse(CalendarLoader.body).first
   calendar.events.flat_map do |event|
     Time.zone = 'London'
     event.dtstart = event.dtstart.in_time_zone
@@ -111,7 +117,7 @@ end
 
 get '/ical' do
   content_type 'text/calendar'
-  open(ICAL_URL)
+  CalendarLoader.body
 end
 
 get '/events/:year/:month' do |year, month|
