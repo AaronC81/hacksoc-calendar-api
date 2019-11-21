@@ -59,14 +59,14 @@ def events_including_surrounding_months(year, month)
   prev_year = year
   if prev_month == 0
     prev_month = 12
-    year -= 1
+    prev_year -= 1
   end
 
   next_month = month + 1
   next_year = year
   if next_month == 13
     next_month = 0
-    year += 1
+    prev_year += 1
   end
 
   events
