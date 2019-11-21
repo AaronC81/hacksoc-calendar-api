@@ -64,3 +64,12 @@ bundle exec main.rb -p 9000 -e production
 ```
 
 Swapping `production` for `development` will enable stack traces and host on `localhost` instead of `0.0.0.0`.
+
+## Testing
+
+There's a small suite of Rack::Test/RSpec tests. To run them:
+
+```
+bundle install --with=development
+bundle exec rspec
+```
